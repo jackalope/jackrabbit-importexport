@@ -1,0 +1,43 @@
+<project name="jack" default="jar">
+    <path id="project.class.path">
+        <fileset dir="../jackrabbit/jackrabbit-standalone/target">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <target name="jar" depends="compile">
+        <pathconvert property="mf.class.path" pathsep=" ">
+            <path refid="project.class.path" />
+        </pathconvert>
+
+        <jar jarfile="build/jack.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="ch.liip.jcr.jack.Jack"/>
+                <attribute name="Class-Path" value="${mf.class.path}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes/"/>
+        <dependset>
+            <srcfileset dir="src" includes="**/*.java" />
+            <targetfileset dir="build/classes" includes="**/*.class" />
+        </dependset>
+        <javac srcdir="src" destdir="build/classes/" debug="on" optimize="on" deprecation="on">
+            <classpath refid="project.class.path" />
+        </javac>
+        <copy todir="build/classes">
+            <fileset dir="src" excludes="*.java"/>
+        </copy>
+    </target>
+
+    <target name="javadoc">
+        <javadoc packagenames="**.*, "
+                 sourcepath="src"
+                     destdir="build/javadoc">
+            <classpath refid="project.class.path"/>
+        </javadoc>
+    </target>
+
+</project>

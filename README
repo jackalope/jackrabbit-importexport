@@ -1,0 +1,23 @@
+jack
+
+A small application to export the system view of a jackrabbit repository and
+to import xml into a repository.
+
+It is part of the jackalope project, an effort to bring JCR to PHP. See http://liip.to/jackalope
+
+(c) David Buchmann, Liip AG, 2009
+This application is licenced under the Apache License, Version 2.0
+http://www.apache.org/licenses/LICENSE-2.0.html
+
+
+Use it like this:
+java -jar jack.jar export targetfile.xml
+java -jar jack.jar import sourcefile.xml
+
+Configuration is done in src/jcr.properties
+The default configuration assumes that jackrabbit is located at ../jackrabbit/jackrabbit-standalone/
+
+Compile
+Uses ant, see the build.xml file for details.
+We expect jackrabbit to be located in folder ../jackrabbit/jackrabbit-standalone/
+If this is not the case, adapt your build.xml accordingly
