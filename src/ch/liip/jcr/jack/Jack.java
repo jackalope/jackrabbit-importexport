@@ -18,10 +18,11 @@ public class Jack {
     public static void main(String[] args) throws Throwable {
         if (args.length != 2) {
             System.out.println("usage: java -jar impexp.jar (import|export) file.xml");
-            System.exit(1);
+            System.exit(2);
         }
         Jack j = new Jack();
 
+        int errorState = 0;
         try {
             if ("import".equals(args[0])) {
                 j.doImport(args[1]);
@@ -33,9 +34,11 @@ public class Jack {
         } catch(Throwable t) {
             System.err.println("Operation failed:");
             System.err.println(t.getMessage());
+            errorState = 1;
         } finally {
             j.close();
         }
+        System.exit(errorState);
     }
 
     //protected DavexClient client;
