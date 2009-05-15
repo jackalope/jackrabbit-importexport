@@ -3,6 +3,9 @@
         <fileset dir="../jackrabbit/jackrabbit-standalone/target">
             <include name="*.jar" />
         </fileset>
+        <fileset dir="lib/">
+            <include name="*.jar" />
+        </fileset>
     </path>
 
     <target name="jar" depends="compile">
