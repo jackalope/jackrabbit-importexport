@@ -114,9 +114,19 @@ public class Jack {
             throw new IllegalArgumentException("File "+filepath+" not existing, can not import");
         }
         try {
+            //Clear repository first
+            Node rootNode = session.getRootNode();
+            NodeIterator nodeList = rootNode.getNodes();
+            while (nodeList.hasNext()) {
+                Node node = nodeList.nextNode();
+                if (!node.getName().equals("jcr:system")) {
+                    node.remove();
+                    session.save();
+                }
+            }
             FileInputStream data = new FileInputStream(f);
             session.importXML(config.getProperty("repository-base-xpath","/"), data,
-                              ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
+                              ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
         } catch(Throwable t) {
             throw new Exception("Failed to import repository to "+
                 config.getProperty("repository-base-xpath","/") +
