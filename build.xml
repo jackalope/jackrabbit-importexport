@@ -1,22 +1,27 @@
 <project name="jack" default="jar">
     <path id="project.class.path">
-        <fileset dir="../jackrabbit/jackrabbit-standalone/target">
+        <!-- order is important. if we include davex first, we get a log4j exception -->
+        <!--fileset dir="../jackrabbit/jackrabbit-standalone/target">
             <include name="*.jar" />
+        </fileset-->
+        <fileset dir="lib/">
+            <include name="jackrabbit*.jar"/>
         </fileset>
         <fileset dir="lib/">
             <include name="*.jar" />
         </fileset>
     </path>
 
-    <target name="jar" depends="compile">
-        <pathconvert property="mf.class.path" pathsep=" ">
-            <path refid="project.class.path" />
-        </pathconvert>
+    <manifestclasspath property="jar.class.path"
+                       jarfile="build/jack.jar">
+      <classpath refid="project.class.path" />
+    </manifestclasspath>
 
+    <target name="jar" depends="compile">
         <jar jarfile="build/jack.jar" basedir="build/classes">
             <manifest>
                 <attribute name="Main-Class" value="ch.liip.jcr.jack.Jack"/>
-                <attribute name="Class-Path" value="${mf.class.path}"/>
+                <attribute name="Class-Path" value="${jar.class.path}"/>
             </manifest>
         </jar>
     </target>
