@@ -32,7 +32,7 @@
             <srcfileset dir="src" includes="**/*.java" />
             <targetfileset dir="build/classes" includes="**/*.class" />
         </dependset>
-        <javac srcdir="src" destdir="build/classes/" debug="on" optimize="on" deprecation="on">
+        <javac srcdir="src" destdir="build/classes/" debug="on" optimize="on" deprecation="on" source="1.3" target="1.3">
             <classpath refid="project.class.path" />
         </javac>
         <copy todir="build/classes">

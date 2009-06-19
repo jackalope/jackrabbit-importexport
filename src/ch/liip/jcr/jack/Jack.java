@@ -8,7 +8,12 @@ import org.apache.jackrabbit.core.TransientRepository;
 import ch.liip.jcr.davex.DavexClient;
 
 /**
-Import or export the entire repository (system view).
+Import or export the entire repository.
+
+Importing autodetects whether you have a system view or document view file.
+For exporting, there are two separate commands:
+ * export for system view
+ * exportdocument for document view
 
 Export and import are done on path specified in src/jcr.properties as repository-base-xpath
 Import is done with behavior IMPORT_UUID_COLLISION_THROW, that is if there already is something in the repository and that happens to have the same UUID, the import will fail.
@@ -28,7 +33,7 @@ Default values for all parameters are set in jcr.properties
 public class Jack {
     public static void main(String[] args) throws Throwable {
         if (args.length < 2) {
-            System.out.println("usage: java -jar jack.jar (import|export) file.xml");
+            System.out.println("usage: java -jar jack.jar (import|export|exportdocument) file.xml");
             System.exit(2);
         }
         Jack j = new Jack(args);
@@ -39,6 +44,8 @@ public class Jack {
                 j.doImport(args[1]);
             } else if ("export".equals(args[0])) {
                 j.doExport(args[1]);
+            } else if ("exportdocument".equals(args[0])) {
+                j.doExportDocument(args[1]);
             } else {
                 System.out.println("Unrecognized command "+args[0]);
             }
@@ -100,6 +107,23 @@ public class Jack {
             FileOutputStream os = new FileOutputStream(f);
             //export all including binary, recursive
             session.exportSystemView(config.getProperty("repository-base-xpath","/"), os, false, false);
+            os.close();
+        } catch(Throwable t) {
+            throw new Exception("Failed to export repository at " +
+                config.getProperty("repository-base-xpath","/") + " to file "+filepath+"\n"+t.toString());
+        }
+        System.out.println("Exported the repository to "+f);
+    }
+
+    public void doExportDocument(String filepath) throws Exception {
+        File f = new File(filepath);
+        if (f.exists()) {
+            throw new IllegalArgumentException("Export file "+filepath+" is existing, can not export");
+        }
+        try {
+            FileOutputStream os = new FileOutputStream(f);
+            //export all including binary, recursive
+            session.exportDocumentView(config.getProperty("repository-base-xpath","/"), os, false, false);
             os.close();
         } catch(Throwable t) {
             throw new Exception("Failed to export repository at " +
