@@ -1,9 +1,6 @@
 <project name="jack" default="jar">
     <path id="project.class.path">
         <!-- order is important. if we include davex first, we get a log4j exception -->
-        <!--fileset dir="../jackrabbit/jackrabbit-standalone/target">
-            <include name="*.jar" />
-        </fileset-->
         <fileset dir="lib/">
             <include name="jackrabbit*.jar"/>
         </fileset>
