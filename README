@@ -11,13 +11,40 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 
 Use it like this:
-java -jar jack.jar export targetfile.xml
-java -jar jack.jar import sourcefile.xml
 
-Configuration is done in src/jcr.properties
-The default configuration assumes that jackrabbit is located at ../jackrabbit/jackrabbit-standalone/
+    # export system view
+    java -jar jack.jar export targetfile.xml <parameters>
+
+    # export document view
+    java -jar jack.jar exportdocument targetfile.xml <parameters>
+
+    # format the resulting xml (its all on 1 line by default)
+    xmllint --format targetfile.xml > data-formatted.xml
+
+
+    # import xml data, system/document is autodetected
+    java -jar jack.jar import sourcefile.xml <parameters>
+
+Set the parameter repository-base-xpath to the name of the node under root node
+you want to export, otherwise you will get a huge jcr:system node with meta
+data you probably don't need.
+
+
+Default configuration is in src/jcr.properties
+
+You can overwrite all options on the command line. Just add name=value
+(without a - or --) at the end of the command.
+
+Available options are the connection options: username, password, transport,
+storage (backend url), and repository-base-xpath to specify nodes under which
+path to export resp. to which node to import.
+
+If you use 'local' as transport, the default configuration assumes that
+jackrabbit is located at ../jackrabbit/jackrabbit-standalone/
+
 
 Compile
+
 Uses ant, see the build.xml file for details.
 We expect jackrabbit to be located in folder ../jackrabbit/jackrabbit-standalone/
 If this is not the case, adapt your build.xml accordingly

@@ -33,7 +33,8 @@ Default values for all parameters are set in jcr.properties
 public class Jack {
     public static void main(String[] args) throws Throwable {
         if (args.length < 2) {
-            System.out.println("usage: java -jar jack.jar (import|export|exportdocument) file.xml");
+            System.out.println("usage: java -jar jack.jar (import|export|exportdocument) file.xml <arguments>");
+            System.out.println("  arguments: username, password, repository-base-xpath, workspace, transport (davex|local), storage (backend url)");
             System.exit(2);
         }
         Jack j = new Jack(args);
@@ -78,18 +79,30 @@ public class Jack {
         String t = config.getProperty("transport");
         if ("local".equals(t)) {
             repository = new TransientRepository(config.getProperty("jackrabbit-config"),
-                                                    config.getProperty("jackrabbit-home"));
+                                                 config.getProperty("jackrabbit-home"));
         } else if ("davex".equals(t)) {
-            //network access (fails because of obscure logging library incompatibilites)
             DavexClient client = new DavexClient(config.getProperty("storage"));
-            repository = client.getRepository();
+            try {
+                repository = client.getRepository();
+            } catch(javax.jcr.RepositoryException e) {
+                System.out.println("\n\nFailed to connect to the backend at "+config.getProperty("storage")+"\n\n\n");
+                throw e;
+            }
         } else {
-            throw new Exception("Unknown transport requested: "+config.getProperty("transport"));
+            throw new Exception("Unknown transport requested: "+t);
         }
 
         SimpleCredentials cred = new SimpleCredentials(config.getProperty("username"),
                                                        config.getProperty("password").toCharArray());
-        session = repository.login(cred, config.getProperty("workspace"));
+
+        try {
+            session = repository.login(cred, config.getProperty("workspace"));
+        } catch(Throwable th) {
+            System.out.println("\n\nFailed to log into the backend with "+
+                               config.getProperty("username")+"/"+config.getProperty("password")+
+                               "\n\n\n");
+            throw th;
+        }
     }
     public void close() {
         session.logout();
@@ -137,23 +150,22 @@ public class Jack {
         if (! f.exists()) {
             throw new IllegalArgumentException("File "+filepath+" not existing, can not import");
         }
+        String path = config.getProperty("repository-base-xpath","/");
         try {
             //Clear repository first
-            Node rootNode = session.getRootNode();
+            Node rootNode = session.getNode(path);
             NodeIterator nodeList = rootNode.getNodes();
             while (nodeList.hasNext()) {
                 Node node = nodeList.nextNode();
                 if (!node.getName().equals("jcr:system")) {
                     node.remove();
-                    session.save();
                 }
             }
+            session.save();
             FileInputStream data = new FileInputStream(f);
-            session.importXML(config.getProperty("repository-base-xpath","/"), data,
-                              ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
+            session.importXML(path, data, ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
         } catch(Throwable t) {
-            throw new Exception("Failed to import repository to "+
-                config.getProperty("repository-base-xpath","/") +
+            throw new Exception("Failed to import repository to "+ path +
                 " from file "+filepath+"\n"+t.toString());
         }
         try {
