@@ -161,6 +161,13 @@ public class Jack {
                     node.remove();
                 }
             }
+            PropertyIterator propertyList = rootNode.getProperties();
+            while (propertyList.hasNext()) {
+                Property property = propertyList.nextProperty();
+                if (!property.getName().startsWith("jcr:")) {
+                    property.remove();
+                }
+            }
             session.save();
             FileInputStream data = new FileInputStream(f);
             session.importXML(path, data, ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
