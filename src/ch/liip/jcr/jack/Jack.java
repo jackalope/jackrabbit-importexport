@@ -157,14 +157,18 @@ public class Jack {
             NodeIterator nodeList = rootNode.getNodes();
             while (nodeList.hasNext()) {
                 Node node = nodeList.nextNode();
-                if (!node.getName().equals("jcr:system")) {
+                if (! (node.getName().equals("jcr:system")
+                       || node.getName().equals("rep:policy") )
+                ) {
                     node.remove();
                 }
             }
             PropertyIterator propertyList = rootNode.getProperties();
             while (propertyList.hasNext()) {
                 Property property = propertyList.nextProperty();
-                if (!property.getName().startsWith("jcr:")) {
+                if (! (property.getName().startsWith("jcr:")
+                       || property.getName().startsWith("rep:"))
+                ) {
                     property.remove();
                 }
             }
