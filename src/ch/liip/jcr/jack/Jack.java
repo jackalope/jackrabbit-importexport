@@ -51,8 +51,7 @@ public class Jack {
                 System.out.println("Unrecognized command "+args[0]);
             }
         } catch(Throwable t) {
-            System.err.println("Operation failed:");
-            System.err.println(t.getMessage());
+            t.printStackTrace();
             errorState = 1;
         } finally {
             j.close();
@@ -123,7 +122,7 @@ public class Jack {
             os.close();
         } catch(Throwable t) {
             throw new Exception("Failed to export repository at " +
-                config.getProperty("repository-base-xpath","/") + " to file "+filepath+"\n"+t.toString());
+                config.getProperty("repository-base-xpath","/") + " to file "+filepath+"\n"+t.toString(), t);
         }
         System.out.println("Exported the repository to "+f);
     }
@@ -140,7 +139,7 @@ public class Jack {
             os.close();
         } catch(Throwable t) {
             throw new Exception("Failed to export repository at " +
-                config.getProperty("repository-base-xpath","/") + " to file "+filepath+"\n"+t.toString());
+                config.getProperty("repository-base-xpath","/") + " to file "+filepath+"\n"+t.toString(), t);
         }
         System.out.println("Exported the repository to "+f);
     }
@@ -177,12 +176,12 @@ public class Jack {
             session.importXML(path, data, ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING);
         } catch(Throwable t) {
             throw new Exception("Failed to import repository to "+ path +
-                " from file "+filepath+"\n"+t.toString());
+                " from file "+filepath+"\n"+t.toString(), t);
         }
         try {
             session.save();
         } catch(Throwable t) {
-            throw new Exception("Failed to save the imported repository: "+t.toString());
+            throw new Exception("Failed to save the imported repository: "+t.toString(), t);
         }
         System.out.println("Imported the repository from "+f);
     }
