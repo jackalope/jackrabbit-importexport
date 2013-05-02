@@ -27,6 +27,7 @@ Parameters are specified after the import / export switch and the filename
  * transport: davex to connect to a server, local to start an own jackrabbit server
  * storage: davex transport only. url for davex connection
  * jackrabbit-config, jackrabbit-home: local transport only. path to jackrabbit data folder
+ * purge-path: path to purge before importing
 
 Default values for all parameters are set in jcr.properties
 */
@@ -153,7 +154,7 @@ public class Jack {
         try {
             //Clear repository first
             Node rootNode = session.getNode(path);
-            NodeIterator nodeList = rootNode.getNodes();
+            NodeIterator nodeList = rootNode.getNodes(config.getProperty("purge-path", "*"));
             while (nodeList.hasNext()) {
                 Node node = nodeList.nextNode();
                 if (! (node.getName().equals("jcr:system")
@@ -166,7 +167,8 @@ public class Jack {
             while (propertyList.hasNext()) {
                 Property property = propertyList.nextProperty();
                 if (! (property.getName().startsWith("jcr:")
-                       || property.getName().startsWith("rep:"))
+                       || property.getName().startsWith("rep:")
+                       || property.getName().startsWith("sling:"))
                 ) {
                     property.remove();
                 }
